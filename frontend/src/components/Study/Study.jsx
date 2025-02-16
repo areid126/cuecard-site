@@ -86,7 +86,7 @@ const Study = ({user}) => {
 
             try {
                 // Get the requested card
-                const res = await app.get(`/api/card?sm=true&${(s && !f)? `s=${s}`: ""}${(!s && f)? `f=${f}`: ""}${(limit && limit > 0)? `&limit=${limit}`: ""}`);
+                const res = await app.get(`/api/card?sm=true&${(s && !f)? `s=${s}`: ""}${(!s && f)? `f=${f}`: ""}${(limit && limit > 0)? `&l=${limit}`: ""}`);
 
                 // If there are cards then set the cards to be them
                 if (res) {
@@ -111,29 +111,40 @@ const Study = ({user}) => {
         setEnd(false);
     }
 
-    const onStarClick = async (e) => {
-        console.log("star clicked");
+    const onStarClick = async () => {
         // Update the star value
         let newCards = [...cards];
         newCards[card].starred = !newCards[card].starred;
         setCards(newCards);
 
+        // Synchronise with the backend
         try {
             // If the card is currently starred then unstar it
-            if (cards[card].starred) await app.patch("/api/user/starred", { card: cards[card].id });
-            else await app.delete(`/api/user/starred/${cards[card].id}`);
+            if (cards[card].starred) await app.patch("/api/card", {cards :[ {id: cards[card].id, starred: 1} ]});
+            else await app.patch("/api/card", {cards :[ {id: cards[card].id, starred: -1} ]});
         } catch (err) {
-            // If it fails the user is not logged in so the changes will not be saved
+            // Do nothing if it errors
         }
     }
 
     // Function for moving onto the next card
-    const onNext = (known) => {
-        const newResults = [...results, {id: cards[card].id, known: known}];
+    const onNext = async (known) => {
+        const newResults = [...results, {id: cards[card].id, known: (known) ? 1 : -1}];
         setResults(newResults);
 
         // If it is the end of the cards then set the end to be true
-        if(card + 1 >= cards.length) setEnd(true);
+        if(card + 1 >= cards.length) {
+            setEnd(true);
+
+            // Post the results to the database
+            try {
+                // If the card is currently starred then unstar it
+                await app.patch("/api/card", {cards : results});
+
+            } catch (err) {
+                // Do nothing if it errors
+            }
+        }
 
         // Otherwise move to the next card
         else {
@@ -154,7 +165,6 @@ const Study = ({user}) => {
     }
 
     const onFilter = async () => {
-        console.log("filtering")
         let newCards;
 
         // Starring and the cards are (not) shuffled
@@ -174,8 +184,6 @@ const Study = ({user}) => {
     }
 
     const onShuffle = async () => {
-        console.log("shuffling")
-
         let newCards;
 
         // Shuffling and (not) starred
@@ -193,20 +201,20 @@ const Study = ({user}) => {
 
     // Prompt the user for a limit to the number of cards to study
     if(limit === 0) return (
-        <section class="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 items-center justify-center"> 
-            <p class="text-2xl text-zinc-700 pb-6">How many cards do you want to study?</p>
-            <div class="flex flex-row gap-7 items-center">
-                <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+        <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 items-center justify-center"> 
+            <p className="text-2xl text-zinc-700 pb-6">How many cards do you want to study?</p>
+            <div className="flex flex-row gap-7 items-center">
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
                     onClick={() => setLimit(-1)}>Study All</button>
-                <p class="text-2xl text-zinc-700 pb-2">or</p>
-                <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+                <p className="text-2xl text-zinc-700 pb-2">or</p>
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
                     onClick={() => setCustom(true)}>Custom Amount</button>
             </div>
             {custom &&
-                <div class="mt-6 flex flex-row gap-6">
-                    <input class="w-24 bg-zinc-100 p-2 rounded-sm outline-none focus:shadow text-zinc-800" 
+                <div className="mt-6 flex flex-row gap-6">
+                    <input className="w-24 bg-zinc-100 p-2 rounded-sm outline-none focus:shadow text-zinc-800" 
                         onChange={(e) => setGetLimit(e.target.value)} type="number" min="1" placeholder="Amount"></input>      
-                    <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-lg pb-2 pt-1 px-3 rounded-sm cursor-pointer"
+                    <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-lg pb-2 pt-1 px-3 rounded-sm cursor-pointer"
                         onClick={() => setLimit(getLimit)}>Save</button>
                 </div>
             }
@@ -215,63 +223,63 @@ const Study = ({user}) => {
 
     // If it is loading then display the loading screen
     if (loading) return (
-        <section class="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
-            <img src="/bouncing-squares.svg" class="h-48 opacity-[0.2]"></img>
+        <section className="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
+            <img src="/bouncing-squares.svg" className="h-48 opacity-[0.2]"></img>
         </section>
     );
 
     // If there are no cards then display a message to the user
     if (!cards || cards.length < 1) return (
-        <section class="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
-            <img src="/NoSearchResult.svg" class="h-96 grayscale"></img>
-            <p class="text-2xl text-zinc-700 pb-9">There are no cards to study.</p>
-            <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to={`/my`}>View All Sets</NavLink></button>
+        <section className="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
+            <img src="/NoSearchResult.svg" className="h-96 grayscale"></img>
+            <p className="text-2xl text-zinc-700 pb-9">There are no cards to study.</p>
+            <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to={`/my`}>View All Sets</NavLink></button>
         </section>
     );
 
     // If the end of the cards is reached display a message to the user
     if (end) return (
-        <section class="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
-            <img src="/Done.svg" class="h-96 grayscale"></img>
-            <p class="text-2xl text-zinc-700 pb-9">You have reached the end of the cards.</p>
-            <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+        <section className="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
+            <img src="/Done.svg" className="h-96 grayscale"></img>
+            <p className="text-2xl text-zinc-700 pb-9">You have reached the end of the cards.</p>
+            <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
                 onClick={restart} >Restart</button>
         </section>
     );
 
     return (
-        <section class="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 justify-center items-center gap-6">
+        <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 justify-center items-center gap-6">
             <p>{`${card + 1}/${cards.length}`}</p>
             <AnimatePresence>
                 <motion.div {...AnimateCard}
-                    class="transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
-                    <img class="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
+                    className="transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
+                    <img className="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
                         onClick={onStarClick} src={cards[card].starred ? "/star-amber-200.svg" : "/star-zinc-800.svg"}></img>
-                    <div onClick={handleFlip} class="h-full w-full absolute z-4"></div>
+                    <div onClick={handleFlip} className="h-full w-full absolute z-4"></div>
                     <>
                         {cards[card].term.file ? 
-                            <img class="rotate-y-360 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
+                            <img className="rotate-y-360 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
                                 src={`${import.meta.env.VITE_BACKEND_URL}/api/image/${cards[card].term.content}`}></img>
                             :
-                            <h1 class="rotate-y-360 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].term.content}</h1>
+                            <h1 className="rotate-y-360 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].term.content}</h1>
                         }
                     </> 
                     <>
                         {cards[card].definition.file ? 
-                            <img class="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
+                            <img className="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
                                 src={`${import.meta.env.VITE_BACKEND_URL}/api/image/${cards[card].definition.content}`}></img>
                             :
-                            <h1 class="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
+                            <h1 className="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
                         }
                     </> 
                 </motion.div>
             </AnimatePresence>
-            <div class="flex flex-row max-w-[1000px] w-full">
-                <div class="flex flex-row items-center justify-start w-1/3">
-                    <button onClick={onUndo}><img class="cursor-pointer hover:opacity-[0.7] mr-10"
+            <div className="flex flex-row max-w-[1000px] w-full">
+                <div className="flex flex-row items-center justify-start w-1/3">
+                    <button onClick={onUndo}><img className="cursor-pointer hover:opacity-[0.7] mr-10"
                         src="/undo-zinc-800.svg"></img></button>
-                    <p class="mr-2">Front:</p>
-                    <select class="cursor-pointer" value={front ? "Term" : "Definition"}
+                    <p className="mr-2">Front:</p>
+                    <select className="cursor-pointer" value={front ? "Term" : "Definition"}
                         onChange={(e) => {
                             if(e.target.value === "Term") {setFront(true); setTerm(true)}
                             else {setFront(false); setTerm(false)}
@@ -280,16 +288,16 @@ const Study = ({user}) => {
                         <option value="Definition">Definition</option>
                     </select>
                 </div>
-                <div class="flex flex-row items-center justify-center w-1/3 gap-10">
-                    <button onClick={() => onNext(false)}><img class="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
+                <div className="flex flex-row items-center justify-center w-1/3 gap-10">
+                    <button onClick={() => onNext(false)}><img className="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
                         src="/cross-rose-400.svg"></img></button>
-                    <button onClick={() => onNext(true)}><img class="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
+                    <button onClick={() => onNext(true)}><img className="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
                         src="/tick-emerald-400.svg"></img></button>
                 </div>
-                <div class="flex flex-row items-center justify-end w-1/3 gap-10">
-                    <button onClick={onShuffle}><img class="cursor-pointer hover:opacity-[0.7]"
+                <div className="flex flex-row items-center justify-end w-1/3 gap-10">
+                    <button onClick={onShuffle}><img className="cursor-pointer hover:opacity-[0.7]"
                         src={(shuffled) ? "/shuffle-indigo-600.svg" : "/shuffle-zinc-800.svg"}></img></button>
-                    <button onClick={onFilter}><img class="cursor-pointer hover:opacity-[0.7]"
+                    <button onClick={onFilter}><img className="cursor-pointer hover:opacity-[0.7]"
                         src={(starred) ? "/starred-indigo-600.svg" : "/starred-zinc-800.svg"}></img></button>
                 </div>
             </div>

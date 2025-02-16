@@ -1,5 +1,5 @@
 const express = require('express');
-const { getCards, starCard, studyCard, newGetCards } = require('../models/cardDatabase');
+const { getCards, starCard, studyCard, newGetCards, getCard } = require('../models/cardDatabase');
 const { getSets, getSet } = require('../models/setDatabase');
 const { getFolder } = require('../models/folderDatabase');
 const { verifyUser } = require('../models/userDatabase');
@@ -36,7 +36,17 @@ router.get("/", async (req, res) => {
         // If it both a set and a folder send an error
         else return res.status(400).send();
 
-        if(sets) res.json(await newGetCards({sets: sets, smart: req.query.sm}));
+        if(sets) {
+            // Get the cards
+            let cards = await newGetCards({sets: sets, smart: req.query.sm}); 
+
+            // If there is a limit apply it
+            let limit;
+            if(req.query.l && (limit = parseInt(req.query.l)) && limit > 0) cards = cards.slice(0, limit);
+            
+            // Send the cards to the user
+            res.json(cards);
+        }
         else res.status(404).send();;
     }
     else res.status(401).send();
@@ -51,13 +61,14 @@ router.patch("/", async (req, res) => {
 
         // Update the details of every card
         for(let i = 0; i < req.body.cards.length; i++) {
-            const set = await getSet(req.body.cards[i].set);
+            const card = await getCard(req.body.cards[i].id);
+            const set = await getSet(card.set);
             // Check the user is allowed to access the cards they are trying to update
-            if(set.user === user.id) {
+            if(set && set.user === user.id) {
                 // -1 = updated to unstarred, 0 = not updated, 1 = updated starred
-                if(req.body.cards[i].starred) await starCard(req.body.cards[i].id, starred === 1); // Update whether the card was starred
+                if(req.body.cards[i].starred) await starCard(req.body.cards[i].id, req.body.cards[i].starred === 1); // Update whether the card was starred
                 // -1 = not known, 0 = skipped, 1 = known
-                if(req.body.cards[i].known) await studyCard(req.body.cards[i].id, known === 1); // Update when the card was last studied
+                if(req.body.cards[i].known) await studyCard(req.body.cards[i].id, req.body.cards[i].known === 1); // Update when the card was last studied
             }
             else return res.status(403).send();
         }

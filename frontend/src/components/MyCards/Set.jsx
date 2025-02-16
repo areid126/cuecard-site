@@ -47,7 +47,7 @@ const Set = ({user}) => {
     const onDelete = async () => {
         try {
             const res = await app.delete(`/api/set/${id}`);
-            if (res.status === 200) navigate("/my/set"); // Send the user back to the sets page
+            if (res.status === 204) navigate("/my/set"); // Send the user back to the sets page
         } catch (err) {
             // Do nothing if the delete fails
         }
@@ -64,10 +64,8 @@ const Set = ({user}) => {
         // Synchronise with the backend
         try {
             // If the card is currently starred then unstar it
-
-            // Need to change the place these are posted to
-            if (set.cards[card].starred) await app.patch("/api/user/starred", { card: set.cards[card].id });
-            else await app.delete(`/api/user/starred/${set.cards[card].id}`);
+            if (set.cards[card].starred) await app.patch("/api/card", {cards :[ {id: set.cards[card].id, starred: 1} ]});
+            else await app.patch("/api/card", {cards :[ {id: set.cards[card].id, starred: -1} ]});
         } catch (err) {
             // Do nothing if it errors
         }
