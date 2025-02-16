@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import app from '../../utils/axiosConfig'
+import { AnimatePresence, motion } from 'framer-motion';
+import app from '../../utils/axiosConfig';
 
 // Function for shuffling the cards (works inplace)
 const shuffle = (array) => {
@@ -39,6 +40,30 @@ const Study = ({user}) => {
     const [getLimit, setGetLimit] = useState(-1);
 
     const navigate = useNavigate(); // Used to navigate between pages
+
+
+    // State for animating card flip
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    // Animation for the card
+    const AnimateCard = {
+        initial: false,
+        animate: {
+            rotateY: !term ? 180 : 360
+        },
+        transition: {
+            duration: 0.6,
+            animationDirection: "normal"
+        },
+        onAnimationComplete: () => setIsAnimating(false)
+    }
+
+    const handleFlip = () => {
+        if(!isAnimating) {
+            setTerm(!term);
+            setIsAnimating(true);
+        }
+    }
 
     // Use an effect to get the set to study
     useEffect(() => {
@@ -217,23 +242,28 @@ const Study = ({user}) => {
     return (
         <section class="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 justify-center items-center gap-6">
             <p>{`${card + 1}/${cards.length}`}</p>
-            <div 
-                class="relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
-                <img class="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
-                    onClick={onStarClick} src={cards[card].starred ? "/icons/star-fill.svg" : "/icons/star-line.svg"}></img>
-                <div onClick={() => setTerm(!term)} class="h-full w-full absolute z-4"></div>
-                {term ? 
-                    cards[card].term.file ? 
-                        <img src={cards[card].term.content}></img>
-                        :
-                        <h1 class="text-3xl font-bold text-center align-middle pb-5">{cards[card].term.content}</h1>
-                    :
-                    cards[card].definition.file ? 
-                        <img src={cards[card].definition.content}></img>
-                        :
-                        <h1 class="text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
-                }
-            </div>
+            <AnimatePresence>
+                <motion.div {...AnimateCard}
+                    class="transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
+                    <img class="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
+                        onClick={onStarClick} src={cards[card].starred ? "/icons/star-fill.svg" : "/icons/star-line.svg"}></img>
+                    <div onClick={handleFlip} class="h-full w-full absolute z-4"></div>
+                    <>
+                        {cards[card].term.file ? 
+                            <img class="rotate-y-360 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" src={cards[card].term.content}></img>
+                            :
+                            <h1 class="rotate-y-360 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].term.content}</h1>
+                        }
+                    </> 
+                    <>
+                        {cards[card].definition.file ? 
+                            <img class="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" src={cards[card].definition.content}></img>
+                            :
+                            <h1 class="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
+                        }
+                    </> 
+                </motion.div>
+            </AnimatePresence>
             <div class="flex flex-row max-w-[1000px] w-full">
                 <div class="flex flex-row items-center justify-start w-1/3">
                     <button onClick={onUndo}><img class="cursor-pointer hover:opacity-[0.7] mr-10"
