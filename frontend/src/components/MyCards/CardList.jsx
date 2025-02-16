@@ -16,7 +16,7 @@ const Card = ({card, onStar, i}) => {
                 :
                 <p class="w-[70%] px-2 text-zinc-600">{card.definition.content}</p>
             }
-            <img class="h-7 cursor-pointer" src={card.starred ? "/icons/star-fill.svg" : "/icons/star-line.svg"}
+            <img class="h-7 cursor-pointer" src={card.starred ? "/star-amber-200.svg" : "/star-zinc-800.svg"}
                 onClick={() => onStar(i)}></img>
         </li>
     );

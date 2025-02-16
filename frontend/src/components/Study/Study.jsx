@@ -95,6 +95,28 @@ const Study = ({user}) => {
                 }
             } catch (err) {
                 // Do nothing if it errors
+
+                setCards(
+                    [
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                    ]
+                );
+
+                setOriginalCards(
+                    [
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
+                    ]
+                );
             } finally {
                 // whether there are sets or not stop loading
                 setLoading(false);
@@ -246,7 +268,7 @@ const Study = ({user}) => {
                 <motion.div {...AnimateCard}
                     class="transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
                     <img class="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
-                        onClick={onStarClick} src={cards[card].starred ? "/icons/star-fill.svg" : "/icons/star-line.svg"}></img>
+                        onClick={onStarClick} src={cards[card].starred ? "/star-amber-200.svg" : "/star-zinc-800.svg"}></img>
                     <div onClick={handleFlip} class="h-full w-full absolute z-4"></div>
                     <>
                         {cards[card].term.file ? 
@@ -267,9 +289,9 @@ const Study = ({user}) => {
             <div class="flex flex-row max-w-[1000px] w-full">
                 <div class="flex flex-row items-center justify-start w-1/3">
                     <button onClick={onUndo}><img class="cursor-pointer hover:opacity-[0.7] mr-10"
-                        src="/icons/arrow-go-back-line.svg"></img></button>
+                        src="/undo-zinc-800.svg"></img></button>
                     <p class="mr-2">Front:</p>
-                    <select value={front ? "Term" : "Definition"}
+                    <select class="cursor-pointer" value={front ? "Term" : "Definition"}
                         onChange={(e) => {
                             if(e.target.value === "Term") {setFront(true); setTerm(true)}
                             else {setFront(false); setTerm(false)}
@@ -280,15 +302,15 @@ const Study = ({user}) => {
                 </div>
                 <div class="flex flex-row items-center justify-center w-1/3 gap-10">
                     <button onClick={() => onNext(false)}><img class="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
-                        src="/icons/close-line.svg"></img></button>
+                        src="/cross-rose-400.svg"></img></button>
                     <button onClick={() => onNext(true)}><img class="h-12 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer hover:shadow"
-                        src="/icons/check-line.svg"></img></button>
+                        src="/tick-emerald-400.svg"></img></button>
                 </div>
                 <div class="flex flex-row items-center justify-end w-1/3 gap-10">
                     <button onClick={onShuffle}><img class="cursor-pointer hover:opacity-[0.7]"
-                        src="/icons/shuffle-line.svg"></img></button>
+                        src={(shuffled) ? "/shuffle-indigo-600.svg" : "/shuffle-zinc-800.svg"}></img></button>
                     <button onClick={onFilter}><img class="cursor-pointer hover:opacity-[0.7]"
-                        src="/icons/star-half-line.svg"></img></button>
+                        src={(starred) ? "/starred-indigo-600.svg" : "/starred-zinc-800.svg"}></img></button>
                 </div>
             </div>
         </section>

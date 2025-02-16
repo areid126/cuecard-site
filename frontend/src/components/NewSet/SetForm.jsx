@@ -10,11 +10,11 @@ const CardDetails = ({ field, fieldName, onFieldChange, onSwitch }) => {
                 {field.file ? 
                 <><input class="bg-white outline-none border border-zinc-100 text rounded-md p-2 grow-1 text-zinc-500 cursor-pointer" 
                     onChange={onFieldChange} type="file" name="image" />
-                <img class="h-10 hover:opacity-[0.7] cursor-pointer mx-4" src="/icons/text.svg" title="Upload Text" onClick={onSwitch}></img></>
+                <img class="h-10 hover:opacity-[0.7] cursor-pointer mx-4" src="/text-zinc-600.svg" title="Upload Text" onClick={onSwitch}></img></>
                 :
                 <><input class="bg-white outline-none focus:border-b-indigo-600 focus:border-b-2 border border-zinc-100 rounded-md p-2 grow-1" 
                     type="text" onChange={onFieldChange} defaultValue={field.content} />
-                <img class="h-10 hover:opacity-[0.7] cursor-pointer mx-4" src="/icons/image-line.svg" title="Upload Image" onClick={onSwitch}></img></>
+                <img class="h-10 hover:opacity-[0.7] cursor-pointer mx-4" src="/image-zinc-600.svg" title="Upload Image" onClick={onSwitch}></img></>
                 }
             </div>
             <label class="font-semibold uppercase text-sm text-zinc-500">{fieldName}</label>
@@ -32,7 +32,7 @@ const CardForm = ({ card, index, onTermChange, onDefinitionChange, onRemoveCardC
                 <CardDetails field={card.definition} onFieldChange={onDefinitionChange} fieldName={"Definition"} onSwitch={onDefSwitch} />
             </div>
             <img class="h-10 grow-0 shrink-0 w-24 hover:opacity-[0.7] cursor-pointer"
-            src="/icons/delete-bin-5-line.svg" onClick={onRemoveCardClick}></img>
+            src="/delete-rose-400.svg" onClick={onRemoveCardClick}></img>
         </li>
     );
 }
@@ -159,15 +159,17 @@ const SetForm = ({ set, user, formName, edit }) => {
         event.preventDefault();
 
         // Construct new set
-        const newSet = { title: title, description: desc, cards: cards, public: visibility };
+        const newSet = { title: title, description: desc, cards: cards };
 
         // Validate the cards
-        if (!newSet.title) return setError("Please Provide a Title");
+        if (!newSet.title) return setError("Please provide a title.");
+        if (cards.length === 0) return setError("Please add at least one card.");
+        if (cards.length > 1000) return setError("Sets cannot contain more than 1000 cards.");
 
         // Loop though all the cards and check they are defined
         for (let i = 0; i < cards.length; i++)
             if (!cards[i].term || !cards[i].definition || !cards[i].term.content || !cards[i].definition.content)
-                return setError("Please Fill Blank Cards");
+                return setError("Please fill in blank cards.");
 
         // If the cards are all filled in and the title is set then post the cards
         try {
@@ -258,7 +260,7 @@ const SetForm = ({ set, user, formName, edit }) => {
                         onRemoveCardClick={onRemoveCardClick} onTermSwitch={onTermSwitch} onDefSwitch={onDefSwitch} />
                     <div class="hover:opacity-[0.7] flex h-24 bg-zinc-100 rounded-xl shadow justify-center items-center w-full text-xl cursor-pointer"
                         onClick={onAddCard} title="Add Card">
-                        <img src="/icons/add-line.svg" class="h-12"></img>
+                        <img src="/plus-zinc-800.svg" class="h-12"></img>
                     </div>
                     <p class="text-center font-semibold text-rose-700">{error}</p>
                     <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-lg font-semibold pb-3 pt-2 px-5 rounded-xl cursor-pointer self-end"

@@ -11,11 +11,11 @@ const Footer = () => {
                 </div>
                 <div class="flex flex-row gap-5 items-end" >
                     <p class="text-xl">Find Me:</p>
-                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/areid126" class="group h-fit w-fit rounded-full border p-1 border-slate-800 hover:opacity-75">
-                        <div class="aspect-[1/1] h-8 w-8 cursor-pointer rounded-full bg-[url('/icons/global-line.svg')] bg-contain bg-center bg-no-repeat"></div>
+                    <a target="_blank" rel="noopener noreferrer" href={import.meta.env.VITE_PORTFOLIO} class="group h-fit w-fit rounded-full border p-1 border-slate-800 hover:opacity-75">
+                        <div class="aspect-[1/1] h-8 w-8 cursor-pointer rounded-full bg-[url('/globe-zinc-800.svg')] bg-contain bg-center bg-no-repeat"></div>
                     </a>            
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/areid126" class="group h-fit w-fit rounded-full border p-1 border-slate-800 hover:opacity-75">
-                        <div class="aspect-[1/1] h-8 w-8 cursor-pointer rounded-full bg-[url('/icons/github-line.svg')] bg-contain bg-center bg-no-repeat"></div>
+                        <div class="aspect-[1/1] h-8 w-8 cursor-pointer rounded-full bg-[url('/github-zinc-800.svg')] bg-contain bg-center bg-no-repeat"></div>
                     </a>
                 </div>
             </div>

@@ -102,9 +102,9 @@ const Set = ({user}) => {
                     <button class="pt-1 pb-2 px-3 rounded-sm bg-indigo-600 text-zinc-50  hover:opacity-[0.9] cursor-pointer">
                         <NavLink to={`/study?s=${id}`}>Study</NavLink>
                     </button>
-                    <NavLink to={`/edit/${id}`} className="hover:opacity-[0.7]"><img class="h-8" src="/icons/pencil-line.svg"></img></NavLink>
+                    <NavLink to={`/edit/${id}`} className="hover:opacity-[0.7]"><img class="h-8" src="/pencil-zinc-800.svg"></img></NavLink>
                     <button onClick={onDelete} class="cursor-pointer hover:opacity-[0.7]">
-                        <img class="h-8" src="/icons/delete-bin-5-line.svg"></img>
+                        <img class="h-8" src="/delete-red-500.svg"></img>
                     </button>
                 </nav>
             </div>

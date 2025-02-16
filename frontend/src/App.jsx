@@ -22,7 +22,7 @@ import EditSet from './components/NewSet/EditSet'
 const App = () => {
 
     // Add state for the current user
-    const [user, setUser] = useState({username: "usernamehere"});
+    const [user, setUser] = useState(undefined);
 
     // At the start of the application check if the user is already logged in (so the user remains logged in between refreshes)
     useEffect(() => {
