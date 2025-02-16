@@ -73,47 +73,47 @@ const Set = ({user}) => {
 
     // If the user is not logged in immediately then load the page
     if (loading) return (
-        <section class="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
-            <img src="/bouncing-squares.svg" class="h-48 opacity-[0.2]"></img>
+        <section className="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
+            <img src="/bouncing-squares.svg" className="h-48 opacity-[0.2]"></img>
         </section>
     );
 
     // If there is no set then tell the user to create a set
     if(!set || !set.cards) return (
-        <section class="min-h-[87vh] m-auto flex flex-col items-center justify-center">
-            <img src="/NoDocuments.svg" class="h-96 grayscale"></img>
-            <p class="text-2xl text-zinc-700 pb-9">The requested set does not exist.</p>
-            <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to="/my/set">View All</NavLink></button>
+        <section className="min-h-[87vh] m-auto flex flex-col items-center justify-center">
+            <img src="/NoDocuments.svg" className="h-96 grayscale"></img>
+            <p className="text-2xl text-zinc-700 pb-9">The requested set does not exist.</p>
+            <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to="/my/set">View All</NavLink></button>
         </section>
     );
 
     // If the user is logged in and has sets then display a list of them to the user
     return (
-        <section class="min-h-[87vh] mx-56 pt-14 flex flex-col px-2">        
-            <div class="flex gap-4 items-end p-5 pb-0 justify-between">
-                <div class="flex flex-row gap-4 items-end">
-                    <h1 class="text-3xl font-semibold">{set.title}</h1>
-                    <p class="pb-1 text-indigo-600">{`${set.cards.length} cards`}</p>
+        <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2">        
+            <div className="flex gap-4 items-end p-5 pb-0 justify-between">
+                <div className="flex flex-row gap-4 items-end">
+                    <h1 className="text-3xl font-semibold">{set.title}</h1>
+                    <p className="pb-1 text-indigo-600">{`${set.cards.length} cards`}</p>
                 </div>
-                <nav class="flex flex-row gap-4 items-center">
-                    <button class="pt-1 pb-2 px-3 rounded-sm bg-indigo-600 text-zinc-50  hover:opacity-[0.9] cursor-pointer">
+                <nav className="flex flex-row gap-4 items-center">
+                    <button className="pt-1 pb-2 px-3 rounded-sm bg-indigo-600 text-zinc-50  hover:opacity-[0.9] cursor-pointer">
                         <NavLink to={`/study?s=${id}`}>Study</NavLink>
                     </button>
-                    <NavLink to={`/edit/${id}`} className="hover:opacity-[0.7]"><img class="h-8" src="/pencil-zinc-800.svg"></img></NavLink>
-                    <button onClick={onDelete} class="cursor-pointer hover:opacity-[0.7]">
-                        <img class="h-8" src="/delete-red-500.svg"></img>
+                    <NavLink to={`/edit/${id}`} className="hover:opacity-[0.7]"><img className="h-8" src="/pencil-zinc-800.svg"></img></NavLink>
+                    <button onClick={onDelete} className="cursor-pointer hover:opacity-[0.7]">
+                        <img className="h-8" src="/delete-red-500.svg"></img>
                     </button>
                 </nav>
             </div>
-            <p class="text-zinc-600 pl-5 mb-6">{set.description}</p>
-            <div class="flex justify-center w-full">
+            <p className="text-zinc-600 pl-5 mb-6">{set.description}</p>
+            <div className="flex justify-center w-full">
                 {set.cards &&  set.cards.length > 0 ?
                     <CardList set={set} onStar={onStar}/>
                     :
-                    <div class="flex flex-col items-center justify-center">
-                        <img src="/NoDocuments.svg" class="h-96 grayscale"></img>
-                        <p class="text-2xl text-zinc-700 pb-9">There are no cards in this set.</p>
-                        <button class="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to={`/edit/${id}`}>Edit Set</NavLink></button>
+                    <div className="flex flex-col items-center justify-center">
+                        <img src="/NoDocuments.svg" className="h-96 grayscale"></img>
+                        <p className="text-2xl text-zinc-700 pb-9">There are no cards in this set.</p>
+                        <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl"><NavLink to={`/edit/${id}`}>Edit Set</NavLink></button>
                     </div>
                 }
             </div>

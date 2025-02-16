@@ -41,7 +41,7 @@ const Home = ({ user }) => {
                 if (res) {
 
                     // Get the number of cards in each set
-                    await Promise.all(res.data.map(async set => {
+                    await Promise.all(res.data.results.map(async set => {
                         return new Promise(async (resolve, reject) => {
                             const cardRes = await app.get(`/api/card?s=${set.id}`);
                             set.count = cardRes.data.length;
@@ -49,7 +49,7 @@ const Home = ({ user }) => {
                         });
                     }));
 
-                    setSets(res.data);
+                    setSets(res.data.results);
                 }
 
                 // Get the folders (limit to 12)

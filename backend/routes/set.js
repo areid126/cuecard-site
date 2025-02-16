@@ -34,11 +34,25 @@ router.get("/", async (req, res) => {
         // Check if the offset is out of length
         if (offset >= sets.length) return res.json([]);
 
+        // Generate the results
+        const results = {};
+        
+        // Set whether there is a previous page
+        if(offset > 0) results.prev =`/api/set?offset=${Math.max(0, offset-limit)}
+            &limit=${Math.max(0, offset-limit) == 0 ? offset : limit}`; // If the new offset is 0 then the limit is the old offset
+
+        // Set whether there is a next page
+        if(offset + limit < sets.length) results.next = `/api/set?offset=${offset + limit}&limit=${limit}`
+
         // Apply the limit and offset to the returned sets
         sets = sets.slice(offset, Math.min(offset + limit, sets.length));
 
+        // Add the sets and count to the results
+        results.count = sets.length;
+        results.results = sets;
+
         // Respond with the resulting set
-        res.json(sets);
+        res.json(results);
     } 
     else res.status(401).send();
 });
