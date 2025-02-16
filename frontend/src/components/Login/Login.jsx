@@ -20,11 +20,6 @@ const Login = ({ setUser, user }) => {
         try {
             const res = await app.post('/api/auth/login', { username: username, password: password });
             if (res) {
-                // Get the user's saved sets
-                const res2 = await app.get(`/api/user/save`);
-                if (res2) res.data.saves = res2.data;
-                else res.data.saves = [];
-
                 setUser(res.data);
                 navigate('/');
             }

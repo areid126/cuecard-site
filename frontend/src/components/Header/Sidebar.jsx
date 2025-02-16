@@ -45,42 +45,42 @@ const Sidebar = () => {
 
     return (
         <>  
-            <button onClick={() => setOpen(!open)} class="w-7 m-5 ml-5 z-2 cursor-pointer">
+            <button onClick={() => setOpen(!open)} className="w-7 m-5 ml-5 z-2 cursor-pointer">
                 <img src="/menu-zinc-800.svg"></img>
             </button>
             <AnimatePresence mode="wait" initial={false}>
-                <nav class="absolute top-0 left-0 flex flex-col items-start opacity-100 z-1">
-                    <ul class="flex flex-col w-56 mt-18">
-                        <li class="ml-2 list-none m-1">
+                <nav className="absolute top-0 left-0 flex flex-col items-start opacity-100 z-1">
+                    <ul className="flex flex-col w-56 mt-18">
+                        <li className="ml-2 list-none m-1">
                             <NavLink to="/" className={({isActive}) => isActive ? "*:bg-fuchsia-50 *:text-fuchsia-700 *:ring" : ""}>
                                 <motion.div key={open ? "minus" : "plus"} {...animateButtons} 
-                                class={`flex flex-row items-center bg-white hover:bg-fuchsia-50 hover:text-fuchsia-700 hover:ring rounded-xl`}>
-                                    <img src="/home-zinc-800.svg" class="w-7 m-3 shrink-0" ></img>
-                                    {open && <motion.p {...animateText}  class="text-lg pr-5 text-nowrap">Home</motion.p>}
+                                className={`flex flex-row items-center bg-white hover:bg-fuchsia-50 hover:text-fuchsia-700 hover:ring rounded-xl`}>
+                                    <img src="/home-zinc-800.svg" className="w-7 m-3 shrink-0" ></img>
+                                    {open && <motion.p {...animateText}  className="text-lg pr-5 text-nowrap">Home</motion.p>}
                                 </motion.div>
                             </NavLink>
                         </li>
-                        <li class="ml-2 list-none m-1">
+                        <li className="ml-2 list-none m-1">
                             <NavLink to="/my" className={({isActive}) => isActive ? "*:bg-emerald-50 *:text-emerald-700 *:ring" : ""}>
-                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} class="flex flex-row items-center bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:ring rounded-xl w-fit">
-                                    <img src="/folder-zinc-800.svg" class="w-7 m-3 shrink-0" ></img>
-                                    {open && <motion.p {...animateText} class="text-lg pr-5 text-nowrap">My Sets</motion.p>}
+                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} className="flex flex-row items-center bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:ring rounded-xl w-fit">
+                                    <img src="/folder-zinc-800.svg" className="w-7 m-3 shrink-0" ></img>
+                                    {open && <motion.p {...animateText} className="text-lg pr-5 text-nowrap">My Sets</motion.p>}
                                 </motion.div>
                             </NavLink>
                         </li>
-                        <li class="ml-2 list-none m-1">
+                        <li className="ml-2 list-none m-1">
                             <NavLink to="/new" className={({isActive}) => isActive ? "*:bg-cyan-50 *:text-cyan-700 *:ring" : ""}>
-                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} class="flex flex-row items-center bg-white hover:bg-cyan-50 hover:text-cyan-700 hover:ring rounded-xl">
-                                    <img src="/plus-zinc-800.svg" class="w-7 m-3 shrink-0" ></img>
-                                    {open && <motion.p {...animateText} class="text-lg pr-5 text-nowrap">New Set</motion.p>}
+                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} className="flex flex-row items-center bg-white hover:bg-cyan-50 hover:text-cyan-700 hover:ring rounded-xl">
+                                    <img src="/plus-zinc-800.svg" className="w-7 m-3 shrink-0" ></img>
+                                    {open && <motion.p {...animateText} className="text-lg pr-5 text-nowrap">New Set</motion.p>}
                                 </motion.div>
                             </NavLink>   
                         </li>
-                        <li class="ml-2 list-none m-1">
+                        <li className="ml-2 list-none m-1">
                             <NavLink to="/account" className={({isActive}) => isActive ? "*:bg-orange-50 *:text-orange-700 *:ring" : ""}>
-                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} class="flex flex-row items-center bg-white hover:bg-orange-50 hover:text-orange-700 hover:ring rounded-xl">
-                                    <img src="/account-zinc-800.svg" class="w-7 m-3 shrink-0" ></img>
-                                    {open && <motion.p {...animateText} class="text-lg pr-5 text-nowrap">Account</motion.p>}
+                                <motion.div key={open ? "minus" : "plus"} {...animateButtons} className="flex flex-row items-center bg-white hover:bg-orange-50 hover:text-orange-700 hover:ring rounded-xl">
+                                    <img src="/account-zinc-800.svg" className="w-7 m-3 shrink-0" ></img>
+                                    {open && <motion.p {...animateText} className="text-lg pr-5 text-nowrap">Account</motion.p>}
                                 </motion.div>
                             </NavLink>   
                         </li>

@@ -30,17 +30,12 @@ const Register = ({ setUser, user }) => {
 
             // Handle the response from backend
             if (res) {
-                // Get the user's saved sets
-                const res2 = await app.get(`/api/user/save`);
-                if (res2) res.data.saves = res2.data;
-                else res.data.saves = [];
-
                 // Update the user
                 setUser(res.data);
                 navigate("/");
             }
         } catch (err) {
-            if (err.response.status === 409) setError("Username taken.");
+            if (err.status === 409) setError("Username taken.");
             else setError("Unexpected error. Please try again.");
         }
     };

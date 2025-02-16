@@ -29,15 +29,7 @@ const App = () => {
         const getUser = async () => {
             try {
                 const res = await app.get("/api/auth/verify");
-                if (res.data) {
-
-                    // Get the user's saved sets
-                    const res2 = await app.get(`/api/user/save`);
-                    if (res2) res.data.saves = res2.data;
-                    else res.data.saves = [];
-
-                    setUser(res.data);
-                }
+                if (res.data) setUser(res.data);
             } catch (err) {
                 // Do nothing if there is no user
             }

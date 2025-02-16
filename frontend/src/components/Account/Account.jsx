@@ -19,7 +19,10 @@ const ChangeUsernameForm = ({ user, setUser }) => {
         try {
             // Change the user's email
             const res = await app.patch(`/api/user`, { username: username });
-            if (res.data) setUser(res.data); // Update the user's details
+            if (res.data) {
+                setUser(res.data); // Update the user's details
+                setError(undefined); // Remove error after success
+            }
             
         } catch (err) {
             // Disply appropriate error messages to the user
@@ -30,14 +33,14 @@ const ChangeUsernameForm = ({ user, setUser }) => {
     }
 
     return (
-        <fieldset class="flex flex-col bg-zinc-50 rounded-xl p-3 max-w-96 w-full items-center gap-4 shadow">
-            <h3 class="text-xl font-semibold">Change Username</h3>
-            <form class="w-full flex flex-col items-center gap-1" onSubmit={handleSubmit}>
-                <input class="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
+        <fieldset className="flex flex-col bg-zinc-50 rounded-xl p-3 max-w-96 w-full items-center gap-4 shadow">
+            <h3 className="text-xl font-semibold">Change Username</h3>
+            <form className="w-full flex flex-col items-center gap-1" onSubmit={handleSubmit}>
+                <input className="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
                     id="username" type="text" onChange={(e) => setUsername(e.target.value)} placeholder="username123" />
-                <label class="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="username">New Username</label>
-                <p class="text-rose-700">{error}</p>
-                <input class="self-end hover:opacity-[0.9] text-white font-semibold bg-indigo-600 pb-2 pt-1 px-2 rounded-xl cursor-pointer" value="Change Username" type="submit" />
+                <label className="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="username">New Username</label>
+                <p className="text-rose-700">{error}</p>
+                <input className="self-end hover:opacity-[0.9] text-white font-semibold bg-indigo-600 pb-2 pt-1 px-2 rounded-xl cursor-pointer" value="Change Username" type="submit" />
             </form>
         </fieldset>
     );
@@ -64,6 +67,7 @@ const ChangePasswordForm = () => {
         try {
             // Only changing password so the user's information in the application should remain the same
             await app.patch(`/api/user`, { password: password1 });
+            setError(undefined); // Remove error after success
         } catch (err) {
             setError("Unexpected error. Please try again.");
         }
@@ -71,17 +75,17 @@ const ChangePasswordForm = () => {
     }
 
     return (
-        <fieldset class="flex flex-col bg-zinc-50 rounded-xl p-3 max-w-96 w-full items-center gap-4 shadow">
-            <h3 class="text-xl font-semibold">Change Password</h3>
-            <form class="w-full flex flex-col items-center gap-1" onSubmit={handleSubmit}>
-                <input class="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
+        <fieldset className="flex flex-col bg-zinc-50 rounded-xl p-3 max-w-96 w-full items-center gap-4 shadow">
+            <h3 className="text-xl font-semibold">Change Password</h3>
+            <form className="w-full flex flex-col items-center gap-1" onSubmit={handleSubmit}>
+                <input className="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
                     id="password" type="password" onChange={(e) => setPassword1(e.target.value)} placeholder="Password01!" />
-                <label class="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="password">New Password</label> 
-                <input class="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
+                <label className="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="password">New Password</label> 
+                <input className="self-start w-full bg-white outline-none focus:ring-2 ring-indigo-600 ring-offset-2 border border-zinc-100 rounded-md p-2 grow-1"
                     id="password" type="password" onChange={(e) => setPassword2(e.target.value)} placeholder="Confirm Password" />
-                <label class="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="password"> Confirm Password</label>
-                <p class="text-rose-700">{error}</p>
-                <input class="self-end hover:opacity-[0.9] text-white font-semibold bg-indigo-600 pb-2 pt-1 px-2 rounded-xl cursor-pointer" value="Change Password" type="submit" />
+                <label className="self-start font-semibold uppercase text-sm text-zinc-500" htmlFor="password"> Confirm Password</label>
+                <p className="text-rose-700">{error}</p>
+                <input className="self-end hover:opacity-[0.9] text-white font-semibold bg-indigo-600 pb-2 pt-1 px-2 rounded-xl cursor-pointer" value="Change Password" type="submit" />
             </form>
         </fieldset>
     );
@@ -89,6 +93,7 @@ const ChangePasswordForm = () => {
 
 const Account = ({ user, setUser }) => {
     const [loading, setLoading] = useState(true);
+    const [userLoading, setUserLoading] = useState(true);
     const navigate = useNavigate();
 
     // Deleting account
@@ -109,25 +114,30 @@ const Account = ({ user, setUser }) => {
     };
 
     useEffect(() => {
+
+        // Give the user time to load in
         setTimeout(() => {
-            if (loading) setLoading(false);
-            if (!loading && !user) navigate("/login")
-        }, 750)
-    }, [loading, user]);
+            if (userLoading) setUserLoading(false);
+            if (!userLoading && !user) navigate("/login");
+        }, 750);
+
+        // Only stop loading if there is a user
+        if(user) setLoading(false);
+    }, [userLoading, user]);
 
     // If the user it not logged in make them login
     if (loading) return (
-        <section class="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
-            <img src="/bouncing-squares.svg" class="h-48 opacity-[0.2]"></img>
+        <section className="min-h-[87vh] px-56 flex items-center justify-center pt-14 text-zinc-800">
+            <img src="/bouncing-squares.svg" className="h-48 opacity-[0.2]"></img>
         </section>
     );
 
     return (
-        <section class="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 items-center gap-4">
-                <h2 class="text-3xl font-semibold">Edit <span class="text-indigo-600">{user.username}</span>'s Details</h2>
+        <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 items-center gap-4">
+                <h2 className="text-3xl font-semibold">Edit <span className="text-indigo-600">{user.username}</span>'s Details</h2>
                 <ChangeUsernameForm user={user} setUser={setUser} />
                 <ChangePasswordForm />
-                <button class="hover:opacity-[0.8] text-white bg-rose-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer shadow hover:drop-shadow-1"
+                <button className="hover:opacity-[0.8] text-white bg-rose-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer shadow hover:drop-shadow-1"
                     onClick={handleDelete} >Delete Account</button>
             
         </section>
