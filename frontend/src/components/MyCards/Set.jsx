@@ -5,8 +5,8 @@ import CardList from "./CardList";
 
 const Set = ({user}) => {
     const { id } = useParams(); // Get the id of the set being studied
-    const [set, setSet] = useState([]);
-    const [userLoading, setUserLoading] = useState([]); // Specifically gives time for the user to load
+    const [set, setSet] = useState(undefined);
+    const [userLoading, setUserLoading] = useState(true); // Specifically gives time for the user to load
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -22,18 +22,17 @@ const Set = ({user}) => {
 
                 // Get the set's cards
                 const res2 = await app.get(`/api/card?s=${id}`);
-                if(res2) setSet({...set, cards: res2.data});
+                if(res2) setSet({...res.data, cards: res2.data});
 
             } catch (err) {
                 // Do nothing if it errors
             }
 
-            // Scroll to the top after getting the sets
+            // Set loading to false after getting the set
             setLoading(false);
-            window.scrollTo(0, 0);
         }
 
-        // If the user is logged in then get their sets
+        // If the user is logged in then get the set
         if(user) getContent();
 
         // Otherwise wait for the user to load before redirecting to the login page
@@ -81,8 +80,8 @@ const Set = ({user}) => {
         </section>
     );
 
-    // If there is no sets then tell the user to create a set
-    if(!set) return (
+    // If there is no set then tell the user to create a set
+    if(!set || !set.cards) return (
         <section class="min-h-[87vh] m-auto flex flex-col items-center justify-center">
             <img src="/NoDocuments.svg" class="h-96 grayscale"></img>
             <p class="text-2xl text-zinc-700 pb-9">The requested set does not exist.</p>

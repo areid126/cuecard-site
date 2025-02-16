@@ -86,7 +86,7 @@ const Study = ({user}) => {
 
             try {
                 // Get the requested card
-                const res = await app.get(`/api/card?${(s && !f)? `s=${s}`: ""}${(!s && f)? `f=${f}`: ""}${(limit && limit > 0)? `&limit=${limit}`: ""}`);
+                const res = await app.get(`/api/card?sm=true&${(s && !f)? `s=${s}`: ""}${(!s && f)? `f=${f}`: ""}${(limit && limit > 0)? `&limit=${limit}`: ""}`);
 
                 // If there are cards then set the cards to be them
                 if (res) {
@@ -95,28 +95,6 @@ const Study = ({user}) => {
                 }
             } catch (err) {
                 // Do nothing if it errors
-
-                setCards(
-                    [
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                    ]
-                );
-
-                setOriginalCards(
-                    [
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                        {term: {file: false, content: "ejfhisjf"}, definition: {file: false, content: "ejfhisjf"}, starred: false, id: 2},
-                    ]
-                );
             } finally {
                 // whether there are sets or not stop loading
                 setLoading(false);
@@ -272,14 +250,16 @@ const Study = ({user}) => {
                     <div onClick={handleFlip} class="h-full w-full absolute z-4"></div>
                     <>
                         {cards[card].term.file ? 
-                            <img class="rotate-y-360 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" src={cards[card].term.content}></img>
+                            <img class="rotate-y-360 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
+                                src={`${import.meta.env.VITE_BACKEND_URL}/api/image/${cards[card].term.content}`}></img>
                             :
                             <h1 class="rotate-y-360 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].term.content}</h1>
                         }
                     </> 
                     <>
                         {cards[card].definition.file ? 
-                            <img class="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" src={cards[card].definition.content}></img>
+                            <img class="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
+                                src={`${import.meta.env.VITE_BACKEND_URL}/api/image/${cards[card].definition.content}`}></img>
                             :
                             <h1 class="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
                         }

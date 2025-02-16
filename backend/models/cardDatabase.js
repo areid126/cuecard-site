@@ -68,7 +68,7 @@ async function getCards(setID) {
 
 // New version of the getCards function that takes more arguments
 async function newGetCards(query) {
-    let filters;
+    let filters = {};
 
     // If the user wants to smart study then apply the smart study filter
     if(query.smart) filters = {$or: [{known: {$lt: 4}}, {next : {$lt: new Date()}}]}

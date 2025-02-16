@@ -2,6 +2,7 @@ const express = require('express');
 const { getCards, starCard, studyCard, newGetCards } = require('../models/cardDatabase');
 const { getSets, getSet } = require('../models/setDatabase');
 const { getFolder } = require('../models/folderDatabase');
+const { verifyUser } = require('../models/userDatabase');
 const router = express.Router();
 
 // Get cards. Has parameters s(set), f(filter), sm(smart) and l(limit)
@@ -36,7 +37,7 @@ router.get("/", async (req, res) => {
         else return res.status(400).send();
 
         if(sets) res.json(await newGetCards({sets: sets, smart: req.query.sm}));
-        else res.status(404).send();
+        else res.status(404).send();;
     }
     else res.status(401).send();
 });

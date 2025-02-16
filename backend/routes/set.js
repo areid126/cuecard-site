@@ -43,6 +43,18 @@ router.get("/", async (req, res) => {
     else res.status(401).send();
 });
 
+// Get endpoint for getting the details of a specific set
+router.get("/:id", async (req, res) => {
+
+    const user = await verifyUser(req.token);
+    const set = await getSet(req.params.id);
+
+    if(user && set && user.id == set.user) res.json(set);
+    else if(!user) res.status(401).send();
+    else if(!set) res.status(404).send();
+    else res.status(403).send();
+});
+
 // Post end point for creating sets
 router.post("/", async (req, res) => {
 
