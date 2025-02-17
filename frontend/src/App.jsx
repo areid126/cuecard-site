@@ -15,6 +15,7 @@ import MyFolders from './components/MyCards/MyFolders'
 import Set from './components/MyCards/Set'
 import CreateSet from './components/NewSet/CreateSet'
 import EditSet from './components/NewSet/EditSet'
+import NotFound from './components/NotFount/NotFound'
 
 
 
@@ -65,6 +66,9 @@ const App = () => {
                 <Route path="/new" element={<CreateSet user={user} />} /> {/* Create a set */}
                 <Route path="/study" element={<Study user={user} />} /> {/* Study a collection of cards */}
                 <Route path="/edit/:id" element={<EditSet user={user} />} /> {/* Edit a specific set */}
+
+                {/* Routes for handling 404s */}
+                <Route path="*" element={<NotFound />}/>
             </Routes>
 
             <Footer />
