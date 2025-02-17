@@ -35,7 +35,7 @@
     "supertest": "^7.0.0"
   },
   "overrides": {
-    "cookie": "0.6.0",
+    "cookie": "$cookie",
     "cookie-signature": "1.2.1"
   }
 }
