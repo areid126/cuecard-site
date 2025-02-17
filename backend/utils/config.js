@@ -17,7 +17,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 
 const CORS_ACCESS = { credentials: true, origin: process.env.FRONTEND_URL };
-const COOKIE_PERMISSIONS = process.env.NODE_ENV === "production" ? { httpOnly: true, sameSite: "none", secure: true } : { httpOnly: true };
+const COOKIE_PERMISSIONS = process.env.NODE_ENV === "production" ? { httpOnly: true, sameSite: "none", secure: true, partitioned: true } : { httpOnly: true };
 
 module.exports = {
     MONGODB_URL,
