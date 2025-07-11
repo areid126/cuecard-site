@@ -20,7 +20,10 @@ const Study = ({user}) => {
     const [end, setEnd] = useState(false);
 
     // State for applying operations
+    const [allCards, setAllCards] = useState(undefined); // The full set of cards
     const [originalCards, setOriginalCards] = useState(undefined); // The original unshuffled, unstarred cards
+    const [known, setKnown] = useState(0);
+    const [unknown, setUnknown] = useState(0);
 
     // State for storing the results of the run through
     const [results, setResults] = useState([]);
@@ -41,10 +44,6 @@ const Study = ({user}) => {
 
     const navigate = useNavigate(); // Used to navigate between pages
 
-
-    // State for animating card flip
-    const [isAnimating, setIsAnimating] = useState(false);
-
     // Animation for the card
     const AnimateCard = {
         initial: false,
@@ -54,19 +53,78 @@ const Study = ({user}) => {
         transition: {
             duration: 0.6,
             animationDirection: "normal"
-        },
-        onAnimationComplete: () => setIsAnimating(false)
-    }
-
-    const handleFlip = () => {
-        if(!isAnimating) {
-            setTerm(!term);
-            setIsAnimating(true);
         }
     }
 
+    const handleFlip = () => {
+        setTerm(!term);
+    }
+
+        // Function for moving onto the next card
+    const onNext = async (know) => {
+        // If there are no cards then return
+        if(!cards) return;
+
+        const newResults = [...results, {id: cards[card].id, known: (know) ? 1 : -1}];
+        setResults(newResults);
+
+        // Update the known/unknown count
+        if(know) setKnown(known + 1);
+        else setUnknown(unknown + 1);
+
+        // If it is the end of the cards then set the end to be true
+        if(card + 1 >= cards.length) {
+            setEnd(true);
+
+            // Post the results to the database
+            try {
+                // If the card is currently starred then unstar it
+                await app.patch("/api/card", {cards : results});
+
+            } catch (err) {
+                // Do nothing if it errors
+            }
+        }
+
+        // Otherwise move to the next card
+        else {
+            setTerm(front);
+            // Hide the back of the card
+            const back = document.querySelector("#card-back");
+            setCard(card + 1);
+            back.classList += " hidden";
+
+
+            // Move to the next card once the card has turned around
+            setTimeout(() => {
+                back.classList.remove("hidden");
+            }, 600);
+        }
+    }
+
+    // Add support for basic keyboard shortcuts
+    const onKeyClick = (event) => {
+        event.preventDefault();
+
+        // Get the desired handler function
+        let handleKey = {
+            "ArrowLeft" : () => onNext(false), // Do not know the card
+            "ArrowRight" : () => onNext(true), // Know the card
+            "ArrowUp" : handleFlip, // Flip card
+            "ArrowDown" : handleFlip, // Flip card
+            " ": handleFlip, // Flip card
+        }[event.key]; // Get the specific handler for that key
+
+        // Call the handler function
+        handleKey?.();
+    }
+
+
     // Use an effect to get the set to study
     useEffect(() => {
+
+        // Add an event listen for keyboard clicks
+        document.addEventListener('keydown', onKeyClick);
 
         // If there is no user try to load the user
         if(!user) setTimeout(() => {
@@ -92,6 +150,7 @@ const Study = ({user}) => {
                 if (res) {
                     setCards(res.data);
                     setOriginalCards(res.data);
+                    setAllCards(res.data);
                 }
             } catch (err) {
                 // Do nothing if it errors
@@ -102,13 +161,53 @@ const Study = ({user}) => {
         }
 
         // If there is a user, get the cards
-        if(user) getCards();
-    }, [user, userLoading, limit]);
+        if(user && loading) getCards();
+
+        // Remove the event listener for clicks
+        return () => document.removeEventListener('keydown', onKeyClick);
+
+    }, [user, userLoading, limit, onKeyClick]);
 
     const restart = () => {
         setCard(0);
         setTerm(front);
         setEnd(false);
+        setKnown(0);
+        setUnknown(0);
+    }
+
+    // Called when continuing to study the unknown cards
+    const continueUnknown = () => {
+
+        console.log("Continuing the cards");
+
+        const newCards = [...originalCards].filter((card) => {
+            // Only keep the card if it is unknown in the results
+            for(let i = 0; i < results.length; i++) {
+                if (results[i].id === card.id && results[i].known === -1) return true;
+                else if (results[i].id === card.id) return false;
+            }
+
+            // If the card is not in the results then it was already known on a previous run
+            return false;
+        });
+
+        // Get only the unknown cards
+        setOriginalCards(newCards);
+
+        // If the cards were previously shuffled then shuffle them again
+        if(shuffled) setCards(shuffle(newCards));
+        else setCards(newCards);
+        setResults([]); // Reset the results
+        restart();
+    }
+
+    const fullRestart = () => {
+        setCards([...allCards]);
+        setShuffled(false);
+        setStarred(false);
+        setResults([]); // Clear the results after studying
+        restart();
     }
 
     const onStarClick = async () => {
@@ -127,34 +226,16 @@ const Study = ({user}) => {
         }
     }
 
-    // Function for moving onto the next card
-    const onNext = async (known) => {
-        const newResults = [...results, {id: cards[card].id, known: (known) ? 1 : -1}];
-        setResults(newResults);
-
-        // If it is the end of the cards then set the end to be true
-        if(card + 1 >= cards.length) {
-            setEnd(true);
-
-            // Post the results to the database
-            try {
-                // If the card is currently starred then unstar it
-                await app.patch("/api/card", {cards : results});
-
-            } catch (err) {
-                // Do nothing if it errors
-            }
-        }
-
-        // Otherwise move to the next card
-        else {
-            setTerm(front);
-            setCard(card + 1);
-        }
-    }
-
     // Function for undoing
     const onUndo = () => {
+
+        // If there are no results then return
+        if(results.length <= 0) return;
+
+        // If the card being undone was known then decrement the known value
+        if(results[results.length - 1].known === 1) setKnown(known - 1);
+        else setUnknown(unknown - 1); // Else decrement the unknown value
+
         // Remove the previous result
         if(results.length > 0) setResults([...results].slice(0, results.length - 1));
         // Go back one card
@@ -204,17 +285,17 @@ const Study = ({user}) => {
         <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 items-center justify-center"> 
             <p className="text-2xl text-zinc-700 pb-6">How many cards do you want to study?</p>
             <div className="flex flex-row gap-7 items-center">
-                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer font-semibold"
                     onClick={() => setLimit(-1)}>Study All</button>
                 <p className="text-2xl text-zinc-700 pb-2">or</p>
-                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer font-semibold"
                     onClick={() => setCustom(true)}>Custom Amount</button>
             </div>
             {custom &&
                 <div className="mt-6 flex flex-row gap-6">
                     <input className="w-24 bg-zinc-100 p-2 rounded-sm outline-none focus:shadow text-zinc-800" 
                         onChange={(e) => setGetLimit(e.target.value)} type="number" min="1" placeholder="Amount"></input>      
-                    <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-lg pb-2 pt-1 px-3 rounded-sm cursor-pointer"
+                    <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-lg pb-2 pt-1 px-3 rounded-sm cursor-pointer font-semibold"
                         onClick={() => setLimit(getLimit)}>Save</button>
                 </div>
             }
@@ -237,22 +318,48 @@ const Study = ({user}) => {
         </section>
     );
 
+    // If the end of the cards is reached with known cards left then allow the user to continue to study the unknown cards
+    if (end && unknown > 0) return (
+        <section className="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
+            <img src="/Done.svg" className="h-96 grayscale"></img>
+            <p className="text-2xl text-zinc-700 pb-9">You have reached the end of the cards. Continue studying the unknown cards.</p>
+            <div className="flex flex-row gap-7 items-center">
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+                    onClick={continueUnknown} >Study Unknown</button>
+                <p className="text-2xl text-zinc-700 pb-2">or</p>
+                <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
+                    onClick={fullRestart} >Restart</button>
+            </div>
+        </section>
+    );
+
     // If the end of the cards is reached display a message to the user
     if (end) return (
         <section className="min-h-[87vh] px-56 flex flex-col items-center justify-center pt-14 text-zinc-800">
             <img src="/Done.svg" className="h-96 grayscale"></img>
             <p className="text-2xl text-zinc-700 pb-9">You have reached the end of the cards.</p>
             <button className="hover:opacity-[0.9] text-white bg-indigo-600 text-2xl pb-3 pt-2 px-5 rounded-xl cursor-pointer"
-                onClick={restart} >Restart</button>
+                onClick={fullRestart} >Restart</button>
         </section>
     );
 
     return (
         <section className="min-h-[87vh] mx-56 pt-14 flex flex-col px-2 justify-center items-center gap-6">
             <p>{`${card + 1}/${cards.length}`}</p>
+            <div className="mb-3 max-w-[1000px] w-full flex flex-row justify-between h-9 m-1">
+                <div className="flex gap-2 items-center">
+                    <p className="bg-rose-100 text-rose-600 font-semibold rounded-sm border border-rose-300 px-2 text-center">{unknown}</p>
+                    <p className="text-rose-600 font-semibold">unknown</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                    <p className="text-emerald-600 font-semibold">known</p>
+                    <p className="bg-emerald-100 text-emerald-600 font-semibold rounded-sm px-2 border border-emerald-300 text-center">{known}</p>
+                </div>
+
+            </div>
             <AnimatePresence>
                 <motion.div {...AnimateCard}
-                    className="transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
+                    className="mb-6 transform-3d relative bg-zinc-100 rounded-xl flex flex-col items-center justify-center h-[60vh] max-w-[1000px] w-full">
                     <img className="z-5 absolute top-4 right-4 h-7 cursor-pointer self-end justify-self-start" 
                         onClick={onStarClick} src={cards[card].starred ? "/star-amber-200.svg" : "/star-zinc-800.svg"}></img>
                     <div onClick={handleFlip} className="h-full w-full absolute z-4"></div>
@@ -266,10 +373,10 @@ const Study = ({user}) => {
                     </> 
                     <>
                         {cards[card].definition.file ? 
-                            <img className="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
+                            <img id="card-back" className="rotate-y-180 absolute backface-hidden max-h-[54vh] max-w-[850px] rounded-lg" 
                                 src={`${import.meta.env.VITE_BACKEND_URL}/api/image/${cards[card].definition.content}`}></img>
                             :
-                            <h1 className="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
+                            <h1 id="card-back" className="rotate-y-180 absolute backface-hidden text-3xl font-bold text-center align-middle pb-5">{cards[card].definition.content}</h1>
                         }
                     </> 
                 </motion.div>

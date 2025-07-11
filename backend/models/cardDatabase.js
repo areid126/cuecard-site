@@ -66,6 +66,11 @@ async function getCards(setID) {
     return cards;
 }
 
+async function getAllCards() {
+    const cards = (await Card.find()).map(card => card.toObject());
+    return cards;
+}
+
 // New version of the getCards function that takes more arguments
 async function newGetCards(query) {
     let filters = {};
@@ -142,8 +147,8 @@ async function studyCard(id, known) {
     const card = await Card.findOne(getHexID(id));
 
     if (card) {
-        // Update the known value
-        if(known && card.known < 30) card.known++;
+        // Update the known value (only if it was last studied a previous day)
+        if(known && card.known < 30 && card.lastStudied != new Date()) card.known++;
         else if (!known && card.known > 0 && card.known < 4) card.known--;
         else if (!known && card.known > 3) card.known = 2;
 
@@ -198,5 +203,6 @@ module.exports = {
     getImageCard,
     starCard,
     studyCard,
-    newGetCards
+    newGetCards,
+    getAllCards
 }
